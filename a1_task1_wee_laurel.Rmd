@@ -1,0 +1,30 @@
+---
+title: 'Task 1: Data wrangling & visualization (Sierra amphibians)'
+author: "Laurel Wee"
+date: "1/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(readxl)
+library(patchwork)
+library(lubridate)
+```
+
+```{r}
+# Read in '.xlsx' data  
+amphibians <- read_excel(here("data","sierra_amphibians.xlsx"))
+
+#Wrangle data to include only mountain yellow-legged frogs. Exclude 'EggMass' life stage. Select life stage, and date
+
+ramu_amphibians <- amphibians %>% 
+  filter(amphibian_species == "RAMU") %>% 
+  select()
+```
+
+
+
+
