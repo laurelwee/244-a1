@@ -15,22 +15,40 @@ library(lubridate)
 ```
 
 ```{r}
-# Read in '.xlsx' data  
+# Read in '.xlsx' data using 'read_excel'
 amphibians <- read_excel(here("data","sierra_amphibians.xlsx"))
 
 # Part 1
-#Wrangle data to include only mountain yellow-legged frogs. Exclude 'EggMass' life stage. Select life stage, and date
+# Make a subset of data to include only mountain yellow-legged frogs. Exclude 'EggMass' life stage. Select life stage, date, amphibian_state, and amphibian_number
 
 ramu_amphibians <- amphibians %>% 
   filter(amphibian_species == "RAMU") %>% 
-  mutate(date = ymd(survey_date)) %>%
+  mutate(date = ymd(survey_date)) %>% # Put 'survey_date' as date 
   select(amphibian_life_stage, date, amphibian_state, amphibian_number) %>% 
   filter(amphibian_life_stage %in% c("Adult","SubAdult","Tadpole")) %>% 
-  mutate(year = year(date)) %>% 
-  group_by(year)
+  mutate(year = year(date)) # Make a new column that includes the year
 ```
-```{r}
 
+
+```{r}
+# Make a subset that is the counts of above df by 'amphibian_life_stage' and year and includes the 'amphibian_number' 
+ramu_count <- ramu_amphibians %>% 
+  group_by(year) %>% 
+  count(amphibian_life_stage, wt = amphibian_number) %>% 
+  rename("count"=n)
+```
+
+```{r, ramu_plot}
+ggplot(data = ramu_count, 
+       aes(year, y= count, fill= amphibian_life_stage))+ 
+  geom_col(color= "black", 
+                 bins = 30, alpha = .75)+
+  facet_wrap(~amphibian_life_stage)+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  labs(x= "Year", y= "Number of Individuals")
+  
+  
 ```
 
 
