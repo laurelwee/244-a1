@@ -18,11 +18,19 @@ library(lubridate)
 # Read in '.xlsx' data  
 amphibians <- read_excel(here("data","sierra_amphibians.xlsx"))
 
+# Part 1
 #Wrangle data to include only mountain yellow-legged frogs. Exclude 'EggMass' life stage. Select life stage, and date
 
 ramu_amphibians <- amphibians %>% 
   filter(amphibian_species == "RAMU") %>% 
-  select()
+  mutate(date = ymd(survey_date)) %>%
+  select(amphibian_life_stage, date, amphibian_state, amphibian_number) %>% 
+  filter(amphibian_life_stage %in% c("Adult","SubAdult","Tadpole")) %>% 
+  mutate(year = year(date)) %>% 
+  group_by(year)
+```
+```{r}
+
 ```
 
 
