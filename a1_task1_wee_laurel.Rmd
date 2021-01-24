@@ -19,12 +19,12 @@ library(lubridate)
 amphibians <- read_excel(here("data","sierra_amphibians.xlsx"))
 
 # Part 1
-# Make a subset of data to include only mountain yellow-legged frogs. Exclude 'EggMass' life stage. Select life stage, date, amphibian_state, and amphibian_number
+# Make a subset of data to include only mountain yellow-legged frogs. Exclude 'EggMass' life stage. Select life stage, date, and amphibian_number
 
 ramu_amphibians <- amphibians %>% 
   filter(amphibian_species == "RAMU") %>% 
   mutate(date = ymd(survey_date)) %>% # Put 'survey_date' as date 
-  select(amphibian_life_stage, date, amphibian_state, amphibian_number) %>% 
+  select(amphibian_life_stage, date, amphibian_number) %>% 
   filter(amphibian_life_stage %in% c("Adult","SubAdult","Tadpole")) %>% 
   mutate(year = year(date)) # Make a new column that includes the year
 ```
@@ -48,7 +48,23 @@ ggplot(data = ramu_count,
   theme(legend.position = "none")+
   labs(x= "Year", y= "Number of Individuals")
   
-  
+```
+Part 2
+
+```{r}
+ramu_top5 <- amphibians %>% 
+  filter(amphibian_species == "RAMU") %>% 
+  mutate(date = ymd(survey_date)) %>% # Put 'survey_date' as date 
+  mutate(lake = paste0("Lake ", lake_id)) %>% 
+  select(amphibian_life_stage, date, lake, amphibian_number) %>% 
+  filter(amphibian_life_stage %in% c("Adult","SubAdult")) %>% 
+  mutate(year = year(date)) %>% #Make a new column that includes the year
+  group_by(lake) %>% 
+  count(wt = amphibian_number) %>% 
+  rename("count"=n) %>% 
+  ungroup(lake) %>% 
+  arrange(-count) %>% 
+  slice_max(count, n=5)
 ```
 
 
