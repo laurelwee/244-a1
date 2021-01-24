@@ -14,7 +14,7 @@ library(patchwork)
 library(lubridate)
 ```
 
-```{r}
+```{r, include=FALSE, warning=FALSE}
 # Read in '.xlsx' data using 'read_excel'
 amphibians <- read_excel(here("data","sierra_amphibians.xlsx"))
 
@@ -30,7 +30,7 @@ ramu_amphibians <- amphibians %>%
 ```
 
 
-```{r}
+```{r, include=FALSE}
 # Make a subset that is the counts of above df by 'amphibian_life_stage' and year and includes the 'amphibian_number' 
 ramu_count <- ramu_amphibians %>% 
   group_by(year) %>% 
@@ -38,20 +38,20 @@ ramu_count <- ramu_amphibians %>%
   rename("count"=n)
 ```
 
-```{r, ramu_plot}
-ggplot(data = ramu_count, 
+```{r, ramu_time_plot, include=FALSE, warning=FALSE}
+ramu_time_plot <- ggplot(data = ramu_count, 
        aes(year, y= count, fill= amphibian_life_stage))+ 
   geom_col(color= "black", 
                  bins = 30, alpha = .75)+
   facet_wrap(~amphibian_life_stage)+
   theme_minimal()+
   theme(legend.position = "none")+
-  labs(x= "Year", y= "Number of Individuals")
+  labs(x= "Year", y= "Total count", title = "Mountain Yellow-legged frogs (Ramu) counts from  1995-2002",subtitle= " Shown for Adult, Subadult, and Tadpool life stages [WEE]")
   
 ```
 Part 2
 
-```{r}
+```{r, include= FALSE}
 ramu_top5 <- amphibians %>% 
   filter(amphibian_species == "RAMU") %>% 
   mutate(date = ymd(survey_date)) %>% # Put 'survey_date' as date 
@@ -66,6 +66,20 @@ ramu_top5 <- amphibians %>%
   arrange(-count) %>% 
   slice_max(count, n=5)
 ```
+
+```{r, ramu_top5_plot, include=FALSE}
+ramu_top5_plot <- ggplot(data = ramu_top5, 
+       aes(lake, count, fill=lake))+
+  geom_col()+
+  theme_minimal()+
+  theme(legend.position = 'none')+
+  labs(x= "Lake", y= "Total count", title = "Mountain Yellow-legged (Ramu) frog counts", subtitle = "Top 5 lakes with largest Ramu counts from 1995-2002 [WEE]")
+```
+```{r, echo=FALSE}
+ramu_combined_plot <- ramu_time_plot/ramu_top5_plot
+ramu_combined_plot
+```
+Figure 1: 
 
 
 
