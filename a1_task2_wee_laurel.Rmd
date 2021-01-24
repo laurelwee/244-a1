@@ -1,0 +1,43 @@
+---
+title: 'Task 2: Principal components analysis'
+author: "Laurel Wee"
+date: "1/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(ggfortify)
+```
+
+## Part 1: Introduction
+
+
+
+```{r}
+env_vars <- read_csv(here("data", "world_env_vars.csv")) %>% 
+  drop_na(cropland_cover,tree_canopy_cover,rain_mean_annual,temp_annual_range)
+
+pca_env_vars <- env_vars %>% 
+ # filter(Country %in% 
+          # c("United States of America","Canada","Mexico")) %>% 
+  select(cropland_cover,tree_canopy_cover,rain_mean_annual,temp_annual_range) %>% 
+  drop_na() %>% 
+  scale() %>% 
+  prcomp()
+```
+```{r}
+autoplot(pca_env_vars, data = env_vars,
+         loadings = TRUE,
+         loadings.label = TRUE,
+         loadings.colour = "black",
+         loadings.label.colour = "black",
+         loadings.label.vjust = -0.5)+
+  theme_minimal()
+
+#screeplot(pca_env_vars, type = "lines")
+
+```
+## Part 3: Summary
