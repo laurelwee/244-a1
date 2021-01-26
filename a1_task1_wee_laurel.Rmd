@@ -1,0 +1,93 @@
+---
+title: 'Task 1: Data wrangling & visualization (Sierra amphibians)'
+author: "Laurel Wee"
+date: "1/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(readxl) 
+library(patchwork) # For combining plots
+library(lubridate) # For working with dates
+```
+
+```{r, include=FALSE, warning=FALSE}
+# Read in '.xlsx' data using 'read_excel'
+amphibians <- read_excel(here("data","sierra_amphibians.xlsx"))
+# Part 1: Plot of Ramu counts 
+# Part 1a: Plot by life stage and time
+# Make a subset of data to include only mountain yellow-legged frogs. 
+
+ramu_amphibians <- amphibians %>% 
+  filter(amphibian_species == "RAMU") %>% 
+  mutate(date = ymd(survey_date)) %>%  # Put 'survey_date' as date 
+  select(amphibian_life_stage, date, amphibian_number) %>%# Select columns amphibian_life_stage, date and amphibian_number so that total counts per year can be done
+  filter(amphibian_life_stage != "EggMass") %>% # Exclude 'EggMass' life stage. 
+  mutate(year = year(date)) # Make a new column that includes the year
+```
+
+
+```{r, include=FALSE}
+# Make a subset that includes the counts of above subset by 'amphibian_life_stage' and year and includes the 'amphibian_number' 
+ramu_count <- ramu_amphibians %>% 
+  group_by(year) %>% 
+  count(amphibian_life_stage, wt = amphibian_number) %>% 
+  rename("count"=n)
+```
+
+```{r, ramu_time_plot, include=FALSE, warning=FALSE}
+# Part 1a plot
+# Make a plot showing the counts of Ramu over time surveyed and compare between life stages
+ramu_time_plot <- ggplot(data = ramu_count, 
+       aes(year, y= count, fill= amphibian_life_stage))+ 
+  geom_col(color= "black", 
+                 bins = 30, alpha = .75)+
+  facet_wrap(~amphibian_life_stage)+
+  theme_minimal()+
+  theme(legend.position = "none")+
+  labs(x= "Year", y= "Total count", subtitle= "Counts shown for Adult, Subadult, and Tadpool life stages")
+  
+```
+
+
+```{r, include= FALSE}
+# Part 2a: Find the 5 lakes with the most Ramu counts
+# Create a subset of data that includes the amphibian_counts for obtaining weighted counts of the 5 lakes with the most Ramu 'Adult' and 'SubAdult'
+ramu_top5 <- amphibians %>% 
+  filter(amphibian_species == "RAMU") %>% 
+  mutate(date = ymd(survey_date)) %>%  # Put 'survey_date' as date 
+  mutate(lake = paste0("Lake ", lake_id)) %>% # Create column to include 'Lake' added to lake_id
+  select(amphibian_life_stage, date, lake, amphibian_number) %>% # Select amphibian_life_stage, amphibian_number and new date and lake columns
+  filter(amphibian_life_stage %in% c("Adult","SubAdult")) %>% # Include only adults and subadults
+  mutate(year = year(date)) %>% #Make a new column that includes the year
+  group_by(lake) %>%  # Group by lakes so count are done by lakes
+  count(wt = amphibian_number) %>% # Count Ramu surveyed and weight the counts by amphibian_number
+  rename("count"=n) %>% 
+  ungroup(lake) %>% # Ungroup lake for arranging
+  arrange(-count) %>% # Arrange lakes by '-count' for descending order
+  slice_max(count, n=5) # Keep the top 5 lakes with greatest Ramu counts
+```
+
+```{r, ramu_top5_plot, include=FALSE}
+#Part 2b: Make a plot to display the top 5 lakes of Ramu counts
+ramu_top5_plot <- ggplot(data = ramu_top5, 
+       aes(x = reorder(lake, -count), y= count,  fill=lake))+
+  geom_col()+
+  theme_minimal()+
+  theme(legend.position = 'none')+
+  labs(x= "Lake", y= "Total count", subtitle = "Top 5 lakes with largest Ramu counts")
+```
+```{r, ramu_combined_plot, echo=FALSE, fig.cap= "Figure: Endangered Mountain Yellow-legged frogs (Rana muscosa) were surveyed from 1995-2002 in the Sierra Lakes. Mountain Yellow-legged frogs are shown to decrease in numbers as they reach adult stage of life as compared to the the tadpool stage (top plot). The five Sierran lakes with the most adult and subadult Mountain Yellow-legged frogs surveyed are, in descending order, Lake 50183, Lake 10223, Lake 10329, Lake 20196 and Lake 10225 (bottom plot."}
+# Part 3 combine the plots made in Part 1 and 2
+ramu_combined_plot <- (ramu_time_plot/ramu_top5_plot) 
+ramu_combined_plot + plot_annotation(title= "Mountain Yellow-legged frogs (Ramu) counts from  1995-2002 [WEE]")
+```
+
+
+### Data citation: 
+Knapp, R.A., C. Pavelka, E.E. Hegeman, and T.C. Smith. 2020. The Sierra Lakes Inventory Project: Non-Native fish and community composition of lakes and ponds in the Sierra Nevada, California ver 2. Environmental Data Initiative. https://doi.org/10.6073/pasta/d835832d7fd00d9e4466e44eea87fab3
+ 
+
