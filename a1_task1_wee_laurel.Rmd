@@ -49,7 +49,7 @@ ramu_time_plot <- ggplot(data = ramu_count,
   labs(x= "Year", y= "Total count", title = "Mountain Yellow-legged frogs (Ramu) counts from  1995-2002",subtitle= " Shown for Adult, Subadult, and Tadpool life stages [WEE]")
   
 ```
-Part 2
+
 
 ```{r, include= FALSE}
 ramu_top5 <- amphibians %>% 
@@ -75,12 +75,13 @@ ramu_top5_plot <- ggplot(data = ramu_top5,
   theme(legend.position = 'none')+
   labs(x= "Lake", y= "Total count", title = "Mountain Yellow-legged (Ramu) frog counts", subtitle = "Top 5 lakes with largest Ramu counts from 1995-2002 [WEE]")
 ```
-```{r, echo=FALSE}
-ramu_combined_plot <- ramu_time_plot/ramu_top5_plot
-ramu_combined_plot
-```
-Figure 1: 
 
+```{r, ramu_combined_plot, echo=FALSE, fig.cap= "Figure: Endangered Mountain Yellow-legged frogs (Rana muscosa) were surveyed from 1995-2002 in the Sierra Lakes. Mountain Yellow-legged frogs are shown to decrease in numbers as they reach adult stage of life as compared to the the tadpool stage (top plot). The five Sierran lakes with the most adult and subadult Mountain Yellow-legged frogs surveyed are, in descending order, Lake 50183, Lake 10223, Lake 10329, Lake 20196 and Lake 10225 (bottom plot)."}
+
+ramu_combined_plot <- ramu_time_plot/ramu_top5_plot	# Part 3 combine the plots made in Part 1 and 2
+
+ramu_combined_plot + plot_annotation(title= "Mountain Yellow-legged frogs (Ramu) counts from  1995-2002 [WEE]")
+```
 
 
 
