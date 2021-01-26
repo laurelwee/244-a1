@@ -1,0 +1,59 @@
+---
+title: 'Task 2: Principal components analysis'
+author: "Laurel Wee"
+date: "1/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(ggfortify) # For PCA
+```
+
+## Part 1: Introduction
+Here we use data on world countries to explore relationships between climate variables and land cover. Using a principal component analysis biplot we will focus on the tree canopy and cropland cover and the mean annual rainfall and temperature range.
+
+### Data Citation: 
+Venter, Zander. Environmental variables for world countries
+Misc climatic and environmental variables for world countries (https://www.kaggle.com/zanderventer/environmental-variables-for-world-countries) derived from Google Earth Engine data (https://earthengine.google.com/).
+
+```{r, warning= FALSE, include=FALSE}
+# Read is world climate variables data
+env_vars <- read_csv(here("data", "world_env_vars.csv")) 
+
+# Create a subset of data selecting cropland_cover,tree_canopy_cover,rain_mean_annual,temp_annual_range variables
+env_select <- env_vars %>% 
+  select(cropland_cover,tree_canopy_cover,rain_mean_annual,temp_annual_range) %>%  drop_na() %>% 
+  rename("Crop land"= "cropland_cover", "Tree canopy"="tree_canopy_cover","Mean rain"="rain_mean_annual", "Temperature range"="temp_annual_range") # renamed columnes so biplot labels would look better
+
+# Make list of variables for PCA 
+pca_env_vars <- env_select %>% 
+  select("Crop land","Tree canopy","Mean rain","Temperature range") %>% 
+  drop_na() %>% 
+  scale() %>% 
+  prcomp()
+```
+## Part 2: PCA biplot
+```{r, warning= FALSE, echo=FALSE, fig.cap= "A Principal Component Analysis biplot showing the presence of correlations between crop land cover, tree canopy cover, annual mean rainfall, and annual mean temperature range."}
+
+# Use autoplot() to create PCA biplot
+autoplot(pca_env_vars, data = env_select,
+         colour = "blue",
+         alpha = 0.2,
+         size = 1,
+         loadings = TRUE,
+         loadings.label = TRUE,
+         loadings.colour = "red",
+         loadings.label.colour = "black",
+         loadings.label.size = 3.5,
+         loadings.label.repel = TRUE,
+         loadings.label.vjust = 1.5,
+         loadings.label.fontface = 2)+
+  ggtitle(label = "Principal Component Analysis of land cover and climatic variables [WEE]")+
+  theme_minimal()
+
+```
+## Part 3: Summary
+Mean annual rain and tree canopy cover are strongly positively correlated with each other and both are strongly negatively correlated with annual temperature range. Tree canopy might benefit from greater rainfall and a smaller annual temperature range. Crop land cover has a small positive correlation with temperature range and a small negative correlation with tree canopy and mean rain. Crop land might exist better without high rainfall and can with stand greater temperature variances due to agricultural infrastructure that controls  for climate variables. 
