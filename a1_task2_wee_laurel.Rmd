@@ -35,7 +35,7 @@ pca_env_vars <- env_select %>%
   scale() %>% 
   prcomp()
 ```
-Part 2: PCA biplot
+## Part 2: PCA biplot
 ```{r, warning= FALSE, echo=FALSE, fig.cap= "A Principal Component Analysis biplot showing the presence of correlations between crop land cover, tree canopy cover, annual mean rainfall, and annual mean temperature range."}
 
 # Use autoplot() to create PCA biplot
